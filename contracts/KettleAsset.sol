@@ -1,19 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { ERC721 } from "solmate/src/tokens/ERC721.sol";
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import { IKettleAssetFactory } from './interfaces/IKettleAssetFactory.sol';
 
-contract KettleAsset is ERC721, Ownable {
+contract KettleAsset is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     IKettleAssetFactory public factory;
 
     string public brand;
     string public model;
     string public ref;
 
-    constructor() ERC721("Kettle", "KETTLE") Ownable(msg.sender) {
-        factory = IKettleAssetFactory(msg.sender);
+    uint256[50] private _gap;
+
+    function initialize(address factoryAddress) public initializer {
+        __ERC721_init("Kettle", "KETTLE");
+        __Ownable_init(factoryAddress);
+
+        factory = IKettleAssetFactory(factoryAddress);
     }
 
     // =====================================
@@ -45,14 +52,6 @@ contract KettleAsset is ERC721, Ownable {
         _burn(tokenId);
     }
 
-    function ownerOf(uint256 id) public view virtual override returns (address owner) {
-        owner = _ownerOf[id];
-    }
-
-    function balanceOf(address owner) public view virtual override returns (uint256 balance) {
-        balance = _balanceOf[owner];
-    }
-
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         return factory.tokenURI(address(this), tokenId);
     }
@@ -66,12 +65,8 @@ contract KettleAsset is ERC721, Ownable {
         address to,
         uint256 id
     ) public virtual override {
-        require(from == _ownerOf[id], "WRONG_FROM");
-
-        require(to != address(0), "INVALID_RECIPIENT");
-
+        require(to != address(0), "INVALID_RECEIVER");
         require(!factory.lockedContracts(address(this)), "CONTRACT_LOCKED");
-
         require(!factory.lockedTokens(address(this), id), "TOKEN_LOCKED");
 
         require(
@@ -79,16 +74,9 @@ contract KettleAsset is ERC721, Ownable {
             "NOT_AUTHORIZED_OPERATOR_OR_TRANSFER"
         );
 
-        unchecked {
-            _balanceOf[from]--;
-            _balanceOf[to]++;
-        }
-
-        _ownerOf[id] = to;
+        super.transferFrom(from, to, id);
 
         factory.removeApprovedTransfer(address(this), from, to, id);
         factory.indexTransfer(address(this), from, to, id);
-
-        emit Transfer(from, to, id);
     }
 }

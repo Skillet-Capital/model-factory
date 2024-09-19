@@ -1,14 +1,40 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
-import { Strings } from '@openzeppelin/contracts/utils/Strings.sol';
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import { BeaconProxy } from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+
+import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { Create2 } from "@openzeppelin/contracts/utils/Create2.sol";
 
 import { KettleAsset } from './KettleAsset.sol';
 
-contract KettleAssetFactory is Ownable {
+import "hardhat/console.sol";
+
+contract KettleAssetFactory is Initializable, OwnableUpgradeable {
     using Strings for uint256;
+
+    address public kettleAssetImplementation;
+    UpgradeableBeacon public beacon;
+
+    string public BASE_URI;
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    
+    mapping(address => bool) public isKettleAsset;
+    mapping(address => mapping(bytes32 => bool)) public roles;
+
+    mapping(address => bool) public operators;
+    mapping(address => bool) public lockedContracts;
+    mapping(address => mapping(uint256 => bool)) public lockedTokens;
+    mapping(address => mapping(address => mapping(address => mapping(uint256 => bool)))) public approvedTransfers;
+
+    uint256[50] private _gap;
 
     event KettleAssetDeployed(
         address indexed asset,
@@ -54,18 +80,12 @@ contract KettleAssetFactory is Ownable {
         bool locked
     );
 
-    string public BASE_URI;
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    
-    mapping(address => bool) public isKettleAsset;
-    mapping(address => mapping(bytes32 => bool)) public roles;
+    function initialize(address owner, address _implementation) public initializer {
+        __Ownable_init(owner);
 
-    mapping(address => bool) public operators;
-    mapping(address => bool) public lockedContracts;
-    mapping(address => mapping(uint256 => bool)) public lockedTokens;
-    mapping(address => mapping(address => mapping(address => mapping(uint256 => bool)))) public approvedTransfers;
+        kettleAssetImplementation = _implementation;
+        beacon = new UpgradeableBeacon(kettleAssetImplementation, address(this));
 
-    constructor(address owner) Ownable(owner) {
         roles[owner][MINTER_ROLE] = true;
     }
     
@@ -78,45 +98,55 @@ contract KettleAssetFactory is Ownable {
         string memory brand, 
         string memory model, 
         string memory ref
-    ) public onlyOwner returns (KettleAsset asset) {
-        bytes memory bytecode = abi.encodePacked(
-            type(KettleAsset).creationCode
+    ) public onlyOwner returns (address proxy) {
+        bytes memory data = abi.encodeWithSelector(
+            KettleAsset.initialize.selector,
+            address(this)
         );
 
-        address addr = _deploy(bytecode, salt);
-        asset = KettleAsset(addr);
+        bytes memory bytecode = abi.encodePacked(
+            type(BeaconProxy).creationCode,
+            abi.encode(address(beacon), data)
+        );
+
+        proxy = Create2.deploy(0, salt, bytecode);
+        require(proxy != address(0), "KettleAssetFactory: Failed to deploy proxy");
+
+        KettleAsset asset = KettleAsset(proxy);
 
         asset.setBrand(brand);
         asset.setModel(model);
         asset.setRef(ref);
 
-        isKettleAsset[addr] = true;
-        emit KettleAssetDeployed(addr, brand, model, ref);
-    }
+        isKettleAsset[proxy] = true;
 
-    function _deploy(bytes memory bytecode, bytes32 salt) internal returns (address addr) {
-        assembly {
-            addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
-            if iszero(extcodesize(addr)) {
-                revert(0, 0)
-            }
-        }
+        emit KettleAssetDeployed(proxy, brand, model, ref);
     }
 
     function getDeploymentAddress(bytes32 salt) external view returns (address) {
-        bytes memory bytecode = abi.encodePacked(
-            type(KettleAsset).creationCode
+        bytes memory data = abi.encodeWithSelector(
+            KettleAsset.initialize.selector,
+            address(this)
         );
 
-        bytes32 _hash = keccak256(
-            abi.encodePacked(
-                bytes1(0xff),
-                address(this),
-                salt,
-                keccak256(bytecode)
-            )
+        bytes memory bytecode = abi.encodePacked(
+            type(BeaconProxy).creationCode,
+            abi.encode(address(beacon), data)
         );
-        return address(uint160(uint256(_hash)));
+
+        return Create2.computeAddress(salt, keccak256(bytecode), address(this));
+    }
+
+    // =====================================
+    //              PROXY ADMIN
+    // =====================================
+
+    function upgradeImplementation(address newImplementation) public onlyOwner {
+        require(newImplementation != address(0), "KettleAssetFactory: new implementation is the zero address");
+        
+        beacon.upgradeTo(newImplementation);
+
+        kettleAssetImplementation = newImplementation;
     }
 
     // =====================================
@@ -227,17 +257,17 @@ contract KettleAssetFactory is Ownable {
     // =====================================
 
     modifier hasRole(bytes32 role) {
-        require(roles[msg.sender][role], "KettleAssetFactory: sender does not have role");
+        require(roles[msg.sender][role], ""); //"KettleAssetFactory: sender does not have role");
         _;
     }
 
     modifier onlyKettleAsset(address asset) {
-        require(isKettleAsset[asset], "KettleAssetFactory: asset not registered");
+        require(isKettleAsset[asset], ""); //"KettleAssetFactory: asset not registered");
         _;
     }
 
     modifier onlyOwnerOrKettleAsset(address asset) {
-        require(isKettleAsset[asset] || msg.sender == owner(), "KettleAssetFactory: sender is not owner or registered asset");
+        require(isKettleAsset[asset] || msg.sender == owner(), ""); //"KettleAssetFactory: sender is not owner or registered asset");
         _;
     }
 }
