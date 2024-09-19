@@ -82,7 +82,18 @@ contract KettleAssetFactory is Initializable, OwnableUpgradeable {
         __Ownable_init(owner);
 
         kettleAssetImplementation = _implementation;
-        beacon = new UpgradeableBeacon(kettleAssetImplementation, address(this));
+
+        bytes memory bytecode = abi.encodePacked(
+            type(UpgradeableBeacon).creationCode,
+            abi.encode(kettleAssetImplementation, address(this))
+        );
+
+        bytes32 salt = keccak256("kettle-asset-factory");
+
+        address target = Create2.deploy(0, salt, bytecode);
+        require(target != address(0), "KettleAssetFactory: Failed to deploy beacon");
+
+        beacon = UpgradeableBeacon(target);
 
         roles[owner][MINTER_ROLE] = true;
     }

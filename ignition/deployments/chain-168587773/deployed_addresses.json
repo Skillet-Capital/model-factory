@@ -1,8 +1,8 @@
 {
-  "ProxyModule#factory": "0xE4dA9C0b9E663f422F6a91b5d95520e744BB16F3",
-  "ProxyModule#TransparentUpgradeableProxy": "0x06687c063d83247672c02D53878Eb71880782f37",
-  "ProxyModule#ProxyAdmin": "0x3b3476f468e0C862DF5b4679b5c9983eD0226e9E",
-  "KettleAssetFactoryInitialization#KettleAssetFactory": "0x06687c063d83247672c02D53878Eb71880782f37",
-  "KettleAssetFactoryInitialization#asset": "0x70a7bc635f3E226FD70A93B5e5d3c2e3004eFdC6",
-  "DeployAsset#KettleAsset": "0x9d806416eE6dC135A891F2f7575Ba7A2F1b5e5d7"
+  "KettleAssetFactoryInitialization#asset": "0x4D673B50d950Fb5C6e615dF68bd8BB12C6B333E9",
+  "ProxyModule#factory": "0xBF8f336F5009417ce90A890BAC4dE04C40E5B5ce",
+  "ProxyModule#TransparentUpgradeableProxy": "0xC8C832A9bf40894b6f6de6BEEAF800bfD2B5C05d",
+  "ProxyModule#ProxyAdmin": "0xFd4A069fd816348Aa01E04ED7B4423eD21FBF503",
+  "KettleAssetFactoryInitialization#KettleAssetFactory": "0xC8C832A9bf40894b6f6de6BEEAF800bfD2B5C05d",
+  "DeployAsset#KettleAsset": "0xDF2C48597005c7060e3f5d9f73eE13398866A225"
 }
