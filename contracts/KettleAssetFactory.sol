@@ -15,8 +15,6 @@ import { Create2 } from "@openzeppelin/contracts/utils/Create2.sol";
 
 import { KettleAsset } from './KettleAsset.sol';
 
-import "hardhat/console.sol";
-
 contract KettleAssetFactory is Initializable, OwnableUpgradeable {
     using Strings for uint256;
 

@@ -65,7 +65,6 @@ contract KettleAsset is Initializable, ERC721Upgradeable, OwnableUpgradeable {
         address to,
         uint256 id
     ) public virtual override {
-        require(to != address(0), "INVALID_RECEIVER");
         require(!factory.lockedContracts(address(this)), "CONTRACT_LOCKED");
         require(!factory.lockedTokens(address(this), id), "TOKEN_LOCKED");
 
