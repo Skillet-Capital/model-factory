@@ -71,7 +71,7 @@ const config: HardhatUserConfig = {
         network: "blast",
         chainId: 81457,
         urls: {
-          apiURL: "https://api.blastscan.io/api",
+          apiURL: "https://api.routescan.io/v2/network/mainnet/evm/81457/etherscan",
           browserURL: "https://blastscan.io"
         }
       }
