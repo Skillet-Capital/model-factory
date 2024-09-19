@@ -15,6 +15,7 @@ contract KettleAssetV2 is KettleAsset {
         address to,
         uint256 tokenId
     ) public override {
+        require(factory.canTransfer(from), "KettleAssetV2: user cannot approved");
         super.transferFrom(from, to, tokenId);
     }
 }
