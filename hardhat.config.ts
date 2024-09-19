@@ -1,5 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@openzeppelin/hardhat-upgrades";
+import "hardhat-tracer";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -13,7 +15,7 @@ const config: HardhatUserConfig = {
           viaIR: true,
           optimizer: {
             enabled: true,
-            runs: 1000,
+            runs: 200,
             details: {
               yulDetails: {
                 optimizerSteps: "u",
@@ -29,12 +31,7 @@ const config: HardhatUserConfig = {
       forking: {
         url: "https://lingering-indulgent-replica.blast-mainnet.quiknode.pro/6667a8f4be701cb6549b415d567bc706fb2f13a8/"
       },
-      accounts: [
-        {
-          privateKey: process.env.PK!,
-          balance: "10000000000000000000000"
-        }
-      ]
+      allowUnlimitedContractSize: true
     },
     blast: {
       url: 'https://lingering-indulgent-replica.blast-mainnet.quiknode.pro/6667a8f4be701cb6549b415d567bc706fb2f13a8/',
