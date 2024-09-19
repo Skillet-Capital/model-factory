@@ -9,7 +9,12 @@ import {
   KettleAsset, 
   KettleAsset__factory, 
   Operator,
-  KettleAssetV2
+  KettleAssetV2,
+  KettleAssetFactory,
+  KettleAssetFactoryV2,
+  BeaconProxy,
+  UpgradeableBeacon,
+  ProxyAdmin
 } from "../typechain-types";
 
 async function computeCreate2Address(factoryAddress: string, beaconAddress: string, salt: string): Promise<string> {
@@ -263,6 +268,46 @@ describe("KettleAsset", function () {
   });
 
   describe("Upradeability", function () {
+    it("should protect upgrades", async function () {
+      const { factory, accounts } = await loadFixture(deployKettleAssetFactory);
+
+      const [attacker] = accounts;
+
+      // BEACON ATTACK: from kettle asset factory
+      const NewKettleAsset = await hre.ethers.getContractFactory("KettleAssetV2");
+      const newImplementation = await NewKettleAsset.deploy();
+
+      const attackerConnection = await factory.connect(attacker) as KettleAssetFactory;
+      await expect(attackerConnection.upgradeImplementation(newImplementation))
+        .to.be.reverted;
+
+      // BEACON ATTACK: directly through beacon
+      const UpgradeableBeacon = await hre.ethers.getContractFactory("UpgradeableBeacon");
+      const beaconAddress = await factory.beacon();
+
+      const beacon = UpgradeableBeacon.attach(beaconAddress) as UpgradeableBeacon;
+
+      expect(await beacon.owner()).to.equal(factory);
+
+      await expect(beacon.upgradeTo(newImplementation))
+        .to.be.reverted;
+
+      // PROXY ATTACK: check ownership of proxy
+      const ProxyAdmin = await hre.ethers.getContractFactory("ProxyAdmin");
+
+      const proxyAdminAddress = await upgrades.erc1967.getAdminAddress(await factory.getAddress());
+      const proxyAdmin = ProxyAdmin.attach(proxyAdminAddress) as ProxyAdmin;
+
+      expect(await proxyAdmin.owner()).to.equal(await factory.owner());
+
+      // PROXY ATTACK: upgrade proxy implementation
+      const NewKettleAssetFactory = await hre.ethers.getContractFactory("KettleAssetFactoryV2");
+      const newFactoryImplementation = await NewKettleAssetFactory.deploy();
+
+      await expect(proxyAdmin.connect(attacker).upgradeAndCall(factory, newFactoryImplementation, "0x"))
+        .to.be.reverted;      
+    })
+
     it("should upgrade asset implementation", async function () {
       const { factory } = await loadFixture(deployKettleAssetFactory);
 
@@ -298,6 +343,46 @@ describe("KettleAsset", function () {
       const asset3 = NewKettleAsset.attach(address3) as KettleAssetV2;
       await asset3.setSerialNumber("3");
       expect(await asset3.serialNumber()).to.equal("3");
+    });
+
+    it("should upgrade factory implementation", async function () {
+      const { factory, accounts } = await loadFixture(deployKettleAssetFactory);
+
+      const salt = hexlify(randomBytes(32));
+      const address = await factory.getDeploymentAddress(salt);
+
+      await factory.deployAsset(salt, "BRAND", "MODEL", "REF");
+
+      const NewFactory = await hre.ethers.getContractFactory("KettleAssetFactoryV2");
+
+      // upgrade factory
+      await upgrades.upgradeProxy(factory, NewFactory);
+      const newFactory = await NewFactory.attach(factory) as KettleAssetFactoryV2;
+
+      const NewKettleAsset = await hre.ethers.getContractFactory("KettleAssetV2");
+      const newAssetImplementation = await NewKettleAsset.deploy();
+
+      await newFactory.upgradeImplementation(newAssetImplementation);
+
+      const asset = NewKettleAsset.attach(address) as KettleAssetV2;
+
+      const Operator = await hre.ethers.getContractFactory("Operator");
+      const operator = await Operator.deploy();
+
+      await newFactory.setOperator(operator, true);
+      
+      expect(await newFactory.isValidOperator(operator)).to.be.true;
+
+      const [from, to] = accounts;
+      await newFactory.setCanTransfer(from, false);
+
+      await asset.connect(from).setApprovalForAll(operator, true);
+      await newFactory.mint(asset, from, 1);
+
+      await expect(operator.transfer(asset, from, to, 1)).to.be.reverted;
+
+      await newFactory.setCanTransfer(from, true);
+      await operator.transfer(asset, from, to, 1);
     });
   });
 });
