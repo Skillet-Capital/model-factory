@@ -1,0 +1,25 @@
+type Account @entity {
+  id: Bytes!
+  assets: [Asset!]! @derivedFrom(field: "owner")
+}
+
+type Asset @entity {
+  id: String!
+  collection: Bytes!
+  identifier: BigInt!
+  owner: Account!
+}
+
+type Balance @entity {
+  id: Bytes!
+  balance: BigInt!
+}
+
+type Transfer @entity {
+  id: String!
+  from: Bytes!
+  to: Bytes!
+  tokenId: BigInt!
+  collection: Bytes!
+  timestamp: BigInt!
+}
