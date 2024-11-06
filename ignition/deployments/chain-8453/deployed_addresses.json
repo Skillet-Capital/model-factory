@@ -1,0 +1,8 @@
+{
+  "KettleAssetFactoryInitialization#asset": "0x325aD98559AE19F24D716356cc5fb27703044f69",
+  "ProxyModule#factory": "0xA4b3B74852a61C94Dc78b3cdFBb135F9810B6154",
+  "ProxyModule#TransparentUpgradeableProxy": "0xC7dB2aFF4E574424B81260601fbCf0544339C283",
+  "ProxyModule#ProxyAdmin": "0xBE301b7164E8D695e7d16086f22E2508593F9C9C",
+  "KettleAssetFactoryInitialization#KettleAssetFactory": "0xC7dB2aFF4E574424B81260601fbCf0544339C283",
+  "DeployAsset#KettleAsset": "0xaD62cf515939E04c0Ae5F2D189f6929Eed206610"
+}

@@ -36,12 +36,14 @@ const config: HardhatUserConfig = {
         process.env.PK!
       ]
     },
-    blast_sepolia: {
-      url: `https://sepolia.blast.io`,
-      accounts: [
-        process.env.PK!,
-      ]
-    },
+    ...(process.env.PK && process.env.BASE_RPC && {
+      base: {
+        url: process.env.BASE_RPC,
+        accounts: [
+          process.env.PK!
+        ]
+      }
+    }),
   },
   ignition: {
     strategyConfig: {
@@ -53,7 +55,8 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       blast_sepolia: "blast_sepolia",
-      blast: "PTQ5343WRG7127WRWQUQMBABZHDSZUTPFW"
+      blast: "PTQ5343WRG7127WRWQUQMBABZHDSZUTPFW",
+      base: "228ZGK626T79PAIYKYFI631RIW2NMY52BT"
     },
     customChains: [
       {
@@ -70,6 +73,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.routescan.io/v2/network/mainnet/evm/81457/etherscan",
           browserURL: "https://blastscan.io"
+        }
+      },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org"
         }
       }
     ]
