@@ -1,5 +1,11 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "codegen": "graph codegen dev.subgraph.yaml",
+    "graph:build": "graph build dev.subgraph.yaml",
+    "dev:create-dev": "source .env && graph create --node ${BASE_GRAPH_URL}:8020/ kettle/kettle-v2-tokens-dev",
+    "dev:deploy-dev": "source .env && graph deploy --node ${BASE_GRAPH_URL}:8020/ --ipfs ${BASE_GRAPH_URL}:5001 kettle/kettle-v2-tokens-dev dev.subgraph.yaml --version-label v0.0.1"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.10"
