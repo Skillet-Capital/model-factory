@@ -9,6 +9,7 @@
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.3.0",
     "dotenv": "^16.4.5",
+    "hardhat-contract-sizer": "^2.10.0",
     "hardhat-tracer": "^3.1.0",
     "solady": "^0.0.243",
     "solmate": "^6.2.0"

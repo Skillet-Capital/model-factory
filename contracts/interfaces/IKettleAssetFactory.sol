@@ -9,6 +9,7 @@ interface IKettleAssetFactory {
     function tokenURI(address asset, uint256 tokenId) external view returns (string memory);
     function indexTransfer(address asset, address from, address to, uint256 tokenId) external;
     function removeApprovedTransfer(address asset, address from, address to, uint256 tokenId) external;
+    function isKettleAsset(address asset) external view returns (bool);
 
     // for tests
     function isValidOperator(address operator) external view returns (bool);
