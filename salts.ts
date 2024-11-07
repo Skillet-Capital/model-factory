@@ -1,0 +1,2 @@
+export const PROD_SALT = "0x53afa40d34dfec5a53781d478e3a7cb32c5f9c004dc7c271c0a02dd248188111";
+export const DEV_SALT = "0xceea0b60d3d45900f6a3d6d9dca8b281ad7e45ff57a412d79d7d4410ba05c7c7";
