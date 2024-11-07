@@ -1,6 +1,11 @@
 {
-  "name": "hardhat-project",
+  "name": "kettle-model-factory",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "version": "0.0.1",
   "scripts": {
+    "build": "hardhat compile && tsc",
+    "prepare": "npm run build",
     "codegen": "graph codegen dev.subgraph.yaml",
     "graph:build": "graph build dev.subgraph.yaml",
     "dev:create-dev": "source .env && graph create --node ${BASE_GRAPH_URL}:8020/ kettle/kettle-v2-tokens-dev",
@@ -8,16 +13,17 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.10"
-  },
-  "dependencies": {
+    "hardhat": "^2.22.10",
+    "dotenv": "^16.4.5",
     "@openzeppelin/contracts": "^5.0.2",
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.3.0",
-    "dotenv": "^16.4.5",
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-tracer": "^3.1.0",
     "solady": "^0.0.243",
     "solmate": "^6.2.0"
+  },
+  "dependencies": {
+    "ethers": "^6.13.4"
   }
 }
