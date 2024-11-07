@@ -8,7 +8,7 @@ dataSources:
     name: ModelFactory
     network: base
     source:
-      address: "0xC7dB2aFF4E574424B81260601fbCf0544339C283"
+      address: "0x7ffFee7Fb6A81BeffE2618cdD6018d36D5C20115"
       abi: ModelFactory
       startBlock: 0
     mapping:
