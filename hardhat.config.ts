@@ -7,6 +7,8 @@ import "hardhat-tracer";
 import dotenv from "dotenv";
 dotenv.config();
 
+import { PROD_SALT, DEV_SALT } from "./salts";
+
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
@@ -31,12 +33,14 @@ const config: HardhatUserConfig = {
     hardhat: {
       allowUnlimitedContractSize: true
     },
-    blast: {
-      url: 'https://lingering-indulgent-replica.blast-mainnet.quiknode.pro/6667a8f4be701cb6549b415d567bc706fb2f13a8/',
-      accounts: [
-        process.env.PK!
-      ]
-    },
+    ...(process.env.PK && process.env.BLAST_RPC && {
+      blast: {
+        url: process.env.BLAST_RPC,
+        accounts: [
+          process.env.PK!
+        ]
+      }
+    }),
     ...(process.env.PK && process.env.BASE_RPC && {
       base: {
         url: process.env.BASE_RPC,
@@ -49,7 +53,7 @@ const config: HardhatUserConfig = {
   ignition: {
     strategyConfig: {
       create2: {
-        salt: "0x93f5329437228ea921a55a2352c28de36cb40e90ed3dd0ef5a7809b4f38a958b",
+        salt: DEV_SALT,
       },
     },
   },
