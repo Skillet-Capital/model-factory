@@ -203,6 +203,8 @@ contract KettleAssetFactory is Initializable, OwnableUpgradeable {
 
     function mint(address asset, address to, uint256 id) public hasRole(MINTER_ROLE) {
         KettleAsset(asset).mint(to, id);
+
+        emit KettleAssetTransferred(asset, address(0), to, id);
     }
 
     function indexTransfer(
