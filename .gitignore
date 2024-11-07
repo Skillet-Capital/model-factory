@@ -19,3 +19,6 @@ ignition/deployments/chain-31337
 # graph code
 generated/
 build/
+
+# sdk
+/dist
