@@ -207,6 +207,10 @@ contract KettleAssetFactory is Initializable, OwnableUpgradeable {
         emit KettleAssetTransferred(asset, address(0), to, id);
     }
 
+    function revokeToken(address asset, uint256 tokenId) public hasRole(MINTER_ROLE) {
+        KettleAsset(asset).revokeToken(tokenId);
+    }
+
     function indexTransfer(
         address asset,
         address from,
@@ -268,17 +272,17 @@ contract KettleAssetFactory is Initializable, OwnableUpgradeable {
     // =====================================
 
     modifier hasRole(bytes32 role) {
-        require(roles[msg.sender][role], ""); //"KettleAssetFactory: sender does not have role");
+        require(roles[msg.sender][role], "invalid role");
         _;
     }
 
     modifier onlyKettleAsset(address asset) {
-        require(isKettleAsset[asset], ""); //"KettleAssetFactory: asset not registered");
+        require(isKettleAsset[asset], "asset not registered");
         _;
     }
 
     modifier onlyOwnerOrKettleAsset(address asset) {
-        require(isKettleAsset[asset] || msg.sender == owner(), ""); //"KettleAssetFactory: sender is not owner or registered asset");
+        require(isKettleAsset[asset] || msg.sender == owner(), "sender is not owner or registered asset");
         _;
     }
 }

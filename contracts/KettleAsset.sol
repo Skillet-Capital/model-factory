@@ -52,6 +52,10 @@ contract KettleAsset is Initializable, ERC721Upgradeable, OwnableUpgradeable {
         _burn(tokenId);
     }
 
+    function revokeToken(uint256 tokenId) public onlyOwner {
+        _burn(tokenId);
+    }
+
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         return factory.tokenURI(address(this), tokenId);
     }
