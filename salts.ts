@@ -1,2 +1,2 @@
-export const PROD_SALT = "0x53afa40d34dfec5a53781d478e3a7cb32c5f9c004dc7c271c0a02dd248188111";
-export const DEV_SALT = "0xceea0b60d3d45900f6a3d6d9dca8b281ad7e45ff57a412d79d7d4410ba05c7c7";
+export const PROD_SALT = "0x1e386611cd2b61a9aec8a681c938e069023f71a1d10ab58b8afe7646830bdd76";
+export const DEV_SALT = "0x36a0edaea58e79852111bca9315a7cdc35d677cad336b30a5556369f14ce0fd8";
