@@ -3,5 +3,10 @@
   "proxy_module_dev#factory": "0xB2f1dA0642dF45dC98745DD22214Cca84d228982",
   "proxy_module_dev#TransparentUpgradeableProxy": "0x325BD9C3a2835FaFc510fF5C6A18CaDC5b04a6c8",
   "proxy_module_dev#ProxyAdmin": "0xbcfeEBB15c00A2DEA53C56C8A65eED4524ad4464",
-  "kettle_asset_factory_init_dev#KettleAssetFactory": "0x325BD9C3a2835FaFc510fF5C6A18CaDC5b04a6c8"
+  "kettle_asset_factory_init_dev#KettleAssetFactory": "0x325BD9C3a2835FaFc510fF5C6A18CaDC5b04a6c8",
+  "kettle_asset_factory_init_prod#asset": "0x5614B82e7b00d6784c1254b5a361fB2bB5706db3",
+  "proxy_module_prod#factory": "0x0bfA12f7D483AFD721F884C463B8B38182bD444b",
+  "proxy_module_prod#TransparentUpgradeableProxy": "0xbc7A4D20D257CF508AccFc503D32eCD2dB45c85D",
+  "proxy_module_prod#ProxyAdmin": "0x8b3B5e39D59eC45e93Ec06329083870E1E55776a",
+  "kettle_asset_factory_init_prod#KettleAssetFactory": "0xbc7A4D20D257CF508AccFc503D32eCD2dB45c85D"
 }
