@@ -6,10 +6,12 @@
   "scripts": {
     "build": "hardhat compile && tsc",
     "prepare": "npm run build",
-    "codegen": "graph codegen dev.subgraph.yaml",
-    "graph:build": "graph build dev.subgraph.yaml",
+    "codegen": "graph codegen base-dev.subgraph.yaml",
+    "graph:build": "graph build base-dev.subgraph.yaml",
     "graph:create-dev": "source .env && graph create --node ${BASE_GRAPH_URL}:8020/ kettle/kettle-v2-tokens-dev",
-    "graph:deploy-dev": "source .env && graph deploy --node ${BASE_GRAPH_URL}:8020/ --ipfs ${BASE_GRAPH_URL}:5001 kettle/kettle-v2-tokens-dev dev.subgraph.yaml --version-label v0.0.1"
+    "graph:deploy-dev": "source .env && graph deploy --node ${BASE_GRAPH_URL}:8020/ --ipfs ${BASE_GRAPH_URL}:5001 kettle/kettle-v2-tokens-dev base-dev.subgraph.yaml --version-label v0.0.1",
+    "graph:create-prod": "source .env && graph create --node ${BASE_GRAPH_URL}:8020/ kettle/kettle-v2-tokens-prod",
+    "graph:deploy-prod": "source .env && graph deploy --node ${BASE_GRAPH_URL}:8020/ --ipfs ${BASE_GRAPH_URL}:5001 kettle/kettle-v2-tokens-prod base-prod.subgraph.yaml --version-label v0.0.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

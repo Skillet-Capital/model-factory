@@ -8,9 +8,9 @@ dataSources:
     name: ModelFactory
     network: base
     source:
-      address: "0x7ffFee7Fb6A81BeffE2618cdD6018d36D5C20115"
+      address: "0xbc7A4D20D257CF508AccFc503D32eCD2dB45c85D"
       abi: ModelFactory
-      startBlock: 22100000
+      startBlock: 23675380
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
